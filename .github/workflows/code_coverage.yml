@@ -36,16 +36,25 @@ jobs:
       - name: Running Unit Tests with Coverage
         run: npm run test:coverage
 
-      - name: Save PR number for SonarCloud workflow
-        if: github.event_name == 'pull_request'
-        run: echo "${{ github.event.pull_request.number }}" > coverage/PR_NUMBER
+      ################
+      # SonarCloud
+      ################
+      - name: Verify SONAR_TOKEN is set
+        if: github.actor != 'dependabot[bot]' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+        run: test -n "$SONAR_TOKEN" || { echo "SONAR_TOKEN is empty — check vars.SONAR_TOKEN_SECRET_NAME"; exit 1; }
+        env:
+          SONAR_TOKEN: ${{ secrets[format('{0}', vars.SONAR_TOKEN_SECRET_NAME)] }}
 
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+      - name: SonarCloud Scan
+        if: github.actor != 'dependabot[bot]' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request')
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets[format('{0}', vars.SONAR_TOKEN_SECRET_NAME)] }}
         with:
-          name: coverage-lcov
-          path: |
-            coverage/lcov.info
-            coverage/PR_NUMBER
-          if-no-files-found: warn
-          retention-days: 7
+          args: >
+            -Dsonar.scm.revision=${{ github.event.pull_request.head.sha || github.sha }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.key={0}', github.event.pull_request.number) || '' }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.branch={0}', github.event.pull_request.head.ref) || '' }}
+            ${{ github.event_name == 'pull_request' && format('-Dsonar.pullrequest.base={0}', github.event.pull_request.base.ref) || '' }}
+            ${{ github.event_name == 'push' && format('-Dsonar.branch.name={0}', github.ref_name) || '' }}
