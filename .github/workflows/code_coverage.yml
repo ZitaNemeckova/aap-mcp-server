@@ -1,0 +1,51 @@
+name: Code Coverage
+on:
+  push:
+    branches:
+      - stable-2.7
+  pull_request:
+    branches:
+      - stable-2.7
+  # have the ability to trigger this workflow manually
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Unit Test and Coverage
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Running Unit Tests with Coverage
+        run: npm run test:coverage
+
+      - name: Save PR number for SonarCloud workflow
+        if: github.event_name == 'pull_request'
+        run: echo "${{ github.event.pull_request.number }}" > coverage/PR_NUMBER
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: |
+            coverage/lcov.info
+            coverage/PR_NUMBER
+          if-no-files-found: warn
+          retention-days: 7
