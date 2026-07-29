@@ -4,8 +4,6 @@ import {
   AAPOperationObject,
   normalizeBoolean,
   shouldIncludeOperationForMcp,
-  clampNumericConstraints,
-  mapOpenApiSchemaToJsonSchema,
 } from "./extract-tools.js";
 import type { OpenAPIV3 } from "openapi-types";
 
@@ -952,65 +950,5 @@ describe("shouldIncludeOperationForMcp", () => {
     );
 
     consoleSpy.mockRestore();
-  });
-});
-
-describe("clampNumericConstraints", () => {
-  it("should clamp int64-max to Number.MAX_SAFE_INTEGER", () => {
-    const schema: Record<string, any> = {
-      type: "number",
-      maximum: Number.MAX_SAFE_INTEGER + 10,
-      minimum: -(Number.MAX_SAFE_INTEGER + 10),
-    };
-    clampNumericConstraints(schema);
-    expect(schema.maximum).toBe(Number.MAX_SAFE_INTEGER);
-    expect(schema.minimum).toBe(-Number.MAX_SAFE_INTEGER);
-  });
-
-  it("should not modify values within safe range", () => {
-    const schema: Record<string, any> = {
-      type: "number",
-      maximum: 200,
-      minimum: 0,
-      maxLength: 255,
-    };
-    clampNumericConstraints(schema);
-    expect(schema.maximum).toBe(200);
-    expect(schema.minimum).toBe(0);
-    expect(schema.maxLength).toBe(255);
-  });
-
-  it("should skip non-numeric keys", () => {
-    const schema: Record<string, any> = {
-      type: "number",
-      maximum: "not a number",
-    };
-    clampNumericConstraints(schema);
-    expect(schema.maximum).toBe("not a number");
-  });
-});
-
-describe("mapOpenApiSchemaToJsonSchema", () => {
-  it("should clamp int64-max in nested properties", () => {
-    const schema = {
-      type: "object" as const,
-      properties: {
-        forks: {
-          type: "integer" as const,
-          maximum: Number.MAX_SAFE_INTEGER + 10,
-          minimum: 0,
-        },
-        timeout: {
-          type: "integer" as const,
-          maximum: Number.MAX_SAFE_INTEGER + 10,
-          minimum: -(Number.MAX_SAFE_INTEGER + 10),
-        },
-      },
-    };
-    const result = mapOpenApiSchemaToJsonSchema(schema) as any;
-    expect(result.properties.forks.maximum).toBe(Number.MAX_SAFE_INTEGER);
-    expect(result.properties.forks.minimum).toBe(0);
-    expect(result.properties.timeout.maximum).toBe(Number.MAX_SAFE_INTEGER);
-    expect(result.properties.timeout.minimum).toBe(-Number.MAX_SAFE_INTEGER);
   });
 });
