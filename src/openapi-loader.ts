@@ -143,9 +143,6 @@ export const getDefaultServiceConfigs = (
     controller: {
       url: "https://s3.amazonaws.com/awx-public-ci-files/release_4.6/schema.json",
     },
-    lightspeed: {
-      url: `${baseUrl}/api/lightspeed/v1/openapi.json`,
-    },
   };
 };
 
@@ -215,23 +212,6 @@ export const reformatGalaxyTool = (
 };
 
 /**
- * Reformat function for Lightspeed tools
- */
-export const reformatLightspeedTool = (
-  tool: AAPMcpToolDefinition,
-): AAPMcpToolDefinition | false => {
-  if (tool.name === "ai_streaming_chat_create") {
-    tool.logs.push({
-      severity: "INFO",
-      msg: "tool ignored, streaming endpoint not supported",
-    });
-    return false;
-  }
-  tool.pathTemplate = "/api/lightspeed/v1" + tool.pathTemplate;
-  return tool;
-};
-
-/**
  * Reformat function for Controller tools
  */
 export const reformatControllerTool = (
@@ -261,7 +241,6 @@ export const getReformatFunctions = (): Record<
     gateway: reformatGatewayTool,
     galaxy: reformatGalaxyTool,
     controller: reformatControllerTool,
-    lightspeed: reformatLightspeedTool,
   };
 };
 
