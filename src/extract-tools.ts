@@ -8,9 +8,6 @@ import { OpenAPIV3 } from "openapi-types";
 import type { JSONSchema7 } from "json-schema";
 import type { McpToolDefinition } from "openapi-mcp-generator";
 
-export const DEFAULT_PAGE_SIZE = 10;
-export const MAX_PAGE_SIZE = 200;
-
 export interface SchemaOverride {
   enum?: string[];
   description?: string;
@@ -31,43 +28,7 @@ export const SCHEMA_OVERRIDES: Record<string, SchemaOverride> = {
   },
 };
 
-export function getDefaultPageSize(config?: { "default-page-size"?: number }): {
-  value: number;
-  source: string;
-} {
-  let resolvedValue: number = DEFAULT_PAGE_SIZE;
-  let source: string = "hard-coded default";
 
-  if (process.env.DEFAULT_PAGE_SIZE) {
-    const envRaw = process.env.DEFAULT_PAGE_SIZE.trim();
-    const envValue = Number(envRaw);
-    if (!Number.isInteger(envValue) || envValue < 1) {
-      throw new Error(
-        `Invalid DEFAULT_PAGE_SIZE environment variable: ${process.env.DEFAULT_PAGE_SIZE}. Must be a positive integer.`,
-      );
-    }
-    resolvedValue = envValue;
-    source = "environment variable";
-  } else if (config?.["default-page-size"] !== undefined) {
-    const configValue = config["default-page-size"];
-    if (!Number.isInteger(configValue) || configValue < 1) {
-      throw new Error(
-        `Invalid default-page-size: ${configValue}. Must be a positive integer.`,
-      );
-    }
-    resolvedValue = configValue;
-    source = "config file";
-  }
-
-  if (resolvedValue > MAX_PAGE_SIZE) {
-    throw new Error(
-      `Invalid page size ${resolvedValue} (from ${source}): exceeds maximum of ${MAX_PAGE_SIZE}. ` +
-        `Large page sizes defeat the purpose of this setting and risk exhausting the LLM context window.`,
-    );
-  }
-
-  return { value: resolvedValue, source };
-}
 
 export interface McpToolLogEntry {
   severity: "INFO" | "WARN" | "ERR";

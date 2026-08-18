@@ -12,7 +12,6 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import {
   extractToolsFromApi,
-  getDefaultPageSize,
   SCHEMA_OVERRIDES,
 } from "./extract-tools.js";
 import { readFileSync, writeFileSync } from "fs";

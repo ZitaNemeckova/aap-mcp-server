@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import {
   extractToolsFromApi,
+  generateInputSchemaAndDetails,
   AAPOperationObject,
   normalizeBoolean,
   shouldIncludeOperationForMcp,
