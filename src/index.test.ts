@@ -73,42 +73,17 @@ describe("mcpGetHandler", () => {
       );
     });
 
-    it("should allow GET request on SSE streaming paths", async () => {
-      (mockReq as any).path = "/mcp/sse/stream-123";
+    it.each([
+      ["/mcp/sse/stream-123", "SSE streaming paths"],
+      ["/mcp/my-toolset", "toolset-specific paths"],
+      ["/mcp/foo/bar/baz", "nested paths"],
+    ])("should allow GET request on %s (%s)", async (path) => {
+      (mockReq as any).path = path;
       mockReq.headers = {
         "mcp-session-id": "session-123",
       };
 
       const { basename } = await import("path");
-
-      // Simulate the handler logic - this should NOT trigger 405
-      const shouldBlock = basename(mockReq.path!) === "mcp";
-
-      expect(shouldBlock).toBe(false);
-    });
-
-    it("should allow GET request on toolset-specific paths", async () => {
-      (mockReq as any).path = "/mcp/my-toolset";
-      mockReq.headers = {
-        "mcp-session-id": "session-123",
-      };
-
-      const { basename } = await import("path");
-
-      // Simulate the handler logic - this should NOT trigger 405
-      const shouldBlock = basename(mockReq.path!) === "mcp";
-
-      expect(shouldBlock).toBe(false);
-    });
-
-    it("should allow GET request on nested paths", async () => {
-      (mockReq as any).path = "/mcp/foo/bar/baz";
-      mockReq.headers = {
-        "mcp-session-id": "session-123",
-      };
-
-      const { basename } = await import("path");
-
       const shouldBlock = basename(mockReq.path!) === "mcp";
 
       expect(shouldBlock).toBe(false);
@@ -116,40 +91,18 @@ describe("mcpGetHandler", () => {
   });
 
   describe("basename edge cases", () => {
-    it("should handle paths ending with /mcp", async () => {
-      (mockReq as any).path = "/api/v1/mcp";
+    it.each([
+      ["/api/v1/mcp", true, "paths ending with /mcp"],
+      ["/mcp/endpoint/data", false, "paths with mcp in the middle"],
+      ["/", false, "root path"],
+      ["", false, "empty path"],
+    ])("should handle %s (shouldBlock=%s, %s)", async (path, expected) => {
+      (mockReq as any).path = path;
 
       const { basename } = await import("path");
       const shouldBlock = basename(mockReq.path!) === "mcp";
 
-      expect(shouldBlock).toBe(true);
-    });
-
-    it("should handle paths with mcp in the middle", async () => {
-      (mockReq as any).path = "/mcp/endpoint/data";
-
-      const { basename } = await import("path");
-      const shouldBlock = basename(mockReq.path!) === "mcp";
-
-      expect(shouldBlock).toBe(false);
-    });
-
-    it("should handle root path", async () => {
-      (mockReq as any).path = "/";
-
-      const { basename } = await import("path");
-      const shouldBlock = basename(mockReq.path!) === "mcp";
-
-      expect(shouldBlock).toBe(false);
-    });
-
-    it("should handle empty path", async () => {
-      (mockReq as any).path = "";
-
-      const { basename } = await import("path");
-      const shouldBlock = basename(mockReq.path!) === "mcp";
-
-      expect(shouldBlock).toBe(false);
+      expect(shouldBlock).toBe(expected);
     });
   });
 
