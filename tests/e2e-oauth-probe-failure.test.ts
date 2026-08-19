@@ -102,6 +102,7 @@ describe("End-to-End: OAuth probe failure graceful degradation", () => {
     process.env.BASE_URL = `http://localhost:${MOCK_AAP_PORT}`;
     process.env.MCP_PORT = String(MCP_SERVER_PORT);
     process.env.OAUTH2_ENABLED = "true";
+    process.env.OAUTH2_DISCOVERY_MAX_RETRIES = "0";
     process.env.MCP_SERVER_URL = `http://localhost:${MCP_SERVER_PORT}`;
     process.env.TELEMETRY_HMAC_KEY = "probe-fail-hmac-key";
     process.env.INSTALLER_ID = "probe-fail-installer-uuid";
