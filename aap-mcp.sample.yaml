@@ -42,6 +42,10 @@ services:
     # url: "https://custom-eda.example.com/api/v1/openapi.json"
     local_path: data/eda-openapi.json
     # enabled: true
+  - name: lightspeed
+    # url: "https://custom-lightspeed.example.com/api/lightspeed/v1/openapi.json"
+    local_path: data/lightspeed.json
+    # enabled: true
 
 toolsets:
   # Phase 1
@@ -71,6 +75,29 @@ toolsets:
     - controller.jobs_job_host_summaries_list
     - controller.workflow_jobs_list
     - controller.workflow_jobs_workflow_nodes_list
+    - controller.job_templates_create
+    - controller.schedules_create
+    - controller.projects_create
+    - controller.job_templates_credentials_create
+    - controller.job_templates_credentials_list
+    - controller.job_templates_survey_spec_create
+    - controller.job_templates_notification_templates_started_create
+    - controller.job_templates_notification_templates_success_create
+    - controller.job_templates_notification_templates_error_create
+    - controller.unified_job_templates_list
+    - controller.projects_playbooks_retrieve
+    - controller.workflow_job_template_nodes_credentials_list
+    - controller.ad_hoc_commands_create
+    - controller.ad_hoc_commands_list
+    - controller.ad_hoc_commands_retrieve
+    - controller.ad_hoc_commands_stdout_retrieve
+    - controller.ad_hoc_commands_events_list
+    - controller.ad_hoc_commands_cancel_create
+    - controller.ad_hoc_commands_relaunch_create
+    - controller.ad_hoc_commands_relaunch_retrieve
+    - controller.hosts_ad_hoc_commands_create
+    - controller.inventories_ad_hoc_commands_create
+    - controller.groups_ad_hoc_commands_create
 
   inventory_management:
     - controller.inventories_list
@@ -80,6 +107,12 @@ toolsets:
     - controller.hosts_variable_data_retrieve
     - controller.groups_list
     - controller.groups_create
+    - controller.inventories_create
+    - controller.hosts_create
+    - controller.inventory_sources_create
+    - controller.hosts_ansible_facts_retrieve
+    - controller.inventory_sources_list
+    - controller.inventories_inventory_sources_list
 
   system_monitoring:
     - controller.instance_groups_list
@@ -130,6 +163,7 @@ toolsets:
     - gateway.authenticators_destroy
     - gateway.authenticator_maps_list
     - gateway.authenticator_maps_create
+    - controller.users_activity_stream_list
     # - galaxy.api_galaxy__ui_v1_namespaces_list
     # - galaxy.api_galaxy__ui_v1_namespaces_create
     # - galaxy.repositories_ansible_ansible_list
@@ -150,6 +184,9 @@ toolsets:
     - controller.credential_types_retrieve
     - controller.credential_types_update
     - controller.credential_types_destroy
+    - controller.credentials_input_sources_create
+    - controller.job_templates_credentials_list
+    - controller.credential_input_sources_list
 
   platform_configuration:
     - controller.settings_list
@@ -170,9 +207,18 @@ toolsets:
     - controller.execution_environments_retrieve
     - controller.execution_environments_update
     - controller.execution_environments_destroy
+    - controller.organizations_execution_environments_create
+    - controller.organizations_instance_groups_create
+    - controller.organizations_galaxy_credentials_create
 
   ai_assistant:
     - lightspeed.ai_chat_create
+
+  content_discovery:
+    - galaxy.ansible_content_collections_index
+    - galaxy.ansible_content_collections_index_versions_get_distro_base_pa
+    - galaxy.execution_environments_repositories_get_repositories
+    - lightspeed.aap_rag_search
 
   # Categories below this comment have yet to be clarified/validated
   # Phase 3

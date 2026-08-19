@@ -8,6 +8,28 @@ import { OpenAPIV3 } from "openapi-types";
 import type { JSONSchema7 } from "json-schema";
 import type { McpToolDefinition } from "openapi-mcp-generator";
 
+export interface SchemaOverride {
+  enum?: string[];
+  description?: string;
+  tools?: string[];
+}
+
+// No AAP API exposes valid role_level filter values dynamically — they are
+// hardcoded in AWX (awx.main.constants.role_name_to_perm_mapping). Additional
+// roles exist (e.g. adhoc_role, use_role, auditor_role, org-scoped admin roles)
+// but do not apply to job_templates. Revisit if broader role_level support is needed.
+const ROLE_LEVELS = ["admin_role", "read_role", "execute_role"];
+
+export const SCHEMA_OVERRIDES: Record<string, SchemaOverride> = {
+  role_level: {
+    enum: ROLE_LEVELS,
+    description: `Filter by role level for RBAC. Must be one of: ${ROLE_LEVELS.join(", ")}.`,
+    tools: ["job_templates_list"],
+  },
+};
+
+
+
 export interface McpToolLogEntry {
   severity: "INFO" | "WARN" | "ERR";
   msg: string;
@@ -131,6 +153,35 @@ function generateOperationId(method: string, path: string): string {
   return name;
 }
 
+const NUMERIC_CONSTRAINT_KEYS = [
+  "maximum",
+  "minimum",
+  "exclusiveMaximum",
+  "exclusiveMinimum",
+  "maxLength",
+  "maxItems",
+  "maxProperties",
+  "minLength",
+  "minItems",
+  "minProperties",
+] as const;
+
+/**
+ * Clamps numeric JSON Schema constraints to Number.MAX_SAFE_INTEGER.
+ * OpenAPI specs generated from Python/Django use int64-max (2^63-1) which
+ * exceeds the safe integer range for JSON and causes API rejections.
+ */
+export function clampNumericConstraints(schema: Record<string, any>): void {
+  for (const key of NUMERIC_CONSTRAINT_KEYS) {
+    if (typeof schema[key] === "number") {
+      schema[key] = Math.max(
+        -Number.MAX_SAFE_INTEGER,
+        Math.min(Number.MAX_SAFE_INTEGER, schema[key]),
+      );
+    }
+  }
+}
+
 /**
  * Maps an OpenAPI schema to a JSON Schema with cycle protection.
  */
@@ -158,6 +209,7 @@ export function mapOpenApiSchemaToJsonSchema(
     const jsonSchema: any = { ...schema };
     // Convert integer type to number (JSON Schema compatible)
     if (schema.type === "integer") jsonSchema.type = "number";
+    clampNumericConstraints(jsonSchema);
     // Remove OpenAPI-specific properties that aren't in JSON Schema
     delete jsonSchema.nullable;
     delete jsonSchema.example;
@@ -261,6 +313,16 @@ export function generateInputSchemaAndDetails(
     );
     if (typeof paramSchema === "object") {
       paramSchema.description = param.description || paramSchema.description;
+    }
+
+    const override = SCHEMA_OVERRIDES[param.name];
+    if (override && typeof paramSchema === "object") {
+      const appliesToTool =
+        !override.tools || override.tools.includes(operation.operationId || "");
+      if (appliesToTool) {
+        const { tools: _, ...schemaProps } = override;
+        Object.assign(paramSchema, schemaProps);
+      }
     }
 
     properties[param.name] = paramSchema;

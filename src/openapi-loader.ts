@@ -143,6 +143,9 @@ export const getDefaultServiceConfigs = (
     controller: {
       url: "https://s3.amazonaws.com/awx-public-ci-files/release_4.6/schema.json",
     },
+    lightspeed: {
+      url: `${baseUrl}/api/lightspeed/v1/openapi.json`,
+    },
   };
 };
 
@@ -184,15 +187,18 @@ export const reformatGalaxyTool = (
     });
     return false;
   }
-  if (!tool.name.startsWith("api_galaxy_v3")) {
+  // Galaxy's OpenAPI schema uses inconsistent operationId prefixes unlike other services
+  const ALLOWED_GALAXY_PREFIXES = ["api_galaxy_v3_", "v3_"];
+  if (!ALLOWED_GALAXY_PREFIXES.some((prefix) => tool.name.startsWith(prefix))) {
     tool.logs.push({
       severity: "INFO",
-      msg: "tool ignored, name doesn't start with api_galaxy_v3",
+      msg: "tool ignored, name doesn't match allowed Galaxy prefixes",
     });
     return false;
   }
   const originalName = tool.name;
-  tool.name = tool.name.replace(/(api_galaxy_v3_|api_galaxy_|)(.+)/, "$2");
+  const prefixPattern = new RegExp(`^(${ALLOWED_GALAXY_PREFIXES.join("|")})`);
+  tool.name = tool.name.replace(prefixPattern, "");
   if (originalName !== tool.name) {
     tool.logs.push({
       severity: "WARN",
@@ -205,6 +211,29 @@ export const reformatGalaxyTool = (
       msg: "tool should be marked as deprecated",
     });
   }
+  return tool;
+};
+
+/**
+ * Reformat function for Lightspeed tools
+ */
+export const reformatLightspeedTool = (
+  tool: AAPMcpToolDefinition,
+): AAPMcpToolDefinition | false => {
+  if (tool.name === "ai_streaming_chat_create") {
+    tool.logs.push({
+      severity: "INFO",
+      msg: "tool ignored, streaming endpoint not supported",
+    });
+    return false;
+  }
+  const nameMap: Record<string, string> = {
+    ai_chat_create: "aap_rag_search",
+  };
+  if (tool.name in nameMap) {
+    tool.name = nameMap[tool.name];
+  }
+  tool.pathTemplate = "/api/lightspeed/v1" + tool.pathTemplate;
   return tool;
 };
 
@@ -238,6 +267,7 @@ export const getReformatFunctions = (): Record<
     gateway: reformatGatewayTool,
     galaxy: reformatGalaxyTool,
     controller: reformatControllerTool,
+    lightspeed: reformatLightspeedTool,
   };
 };
 

@@ -37,6 +37,7 @@ import {
   reformatGatewayTool,
   reformatGalaxyTool,
   reformatControllerTool,
+  reformatLightspeedTool,
   getReformatFunctions,
   filterEnabledServices,
   buildSpecEntries,
@@ -75,6 +76,9 @@ describe("OpenAPI Loader", () => {
         controller: {
           url: "https://s3.amazonaws.com/awx-public-ci-files/release_4.6/schema.json",
         },
+        lightspeed: {
+          url: "https://example.com/api/lightspeed/v1/openapi.json",
+        },
       });
     });
 
@@ -93,6 +97,9 @@ describe("OpenAPI Loader", () => {
       );
       expect(configs.controller.url).toBe(
         "https://s3.amazonaws.com/awx-public-ci-files/release_4.6/schema.json",
+      );
+      expect(configs.lightspeed.url).toBe(
+        "https://localhost:8080/api/lightspeed/v1/openapi.json",
       );
     });
   });
@@ -216,20 +223,46 @@ describe("OpenAPI Loader", () => {
       expect(result).toBe(false);
       expect(mockTool.logs).toContainEqual({
         severity: "INFO",
-        msg: "tool ignored, name doesn't start with api_galaxy_v3",
+        msg: "tool ignored, name doesn't match allowed Galaxy prefixes",
       });
     });
 
-    it("should rename v3 tools correctly", () => {
-      const mockTool = createMockTool({
-        name: "api_galaxy_v3_collections_create",
-      });
+    it.each([
+      [
+        "api_galaxy_v3_",
+        "api_galaxy_v3_collections_create",
+        "collections_create",
+      ],
+      [
+        "v3_",
+        "v3_ansible_content_collections_index",
+        "ansible_content_collections_index",
+      ],
+    ])(
+      "should strip %s prefix and rename correctly",
+      (_prefix, input, expected) => {
+        const mockTool = createMockTool({ name: input });
 
-      const result = reformatGalaxyTool(mockTool);
+        const result = reformatGalaxyTool(mockTool);
 
-      expect(result).toBeTruthy();
-      if (result) {
-        expect(result.name).toBe("collections_create");
+        expect(result).toBeTruthy();
+        if (result) {
+          expect(result.name).toBe(expected);
+        }
+      },
+    );
+
+    it("should allow all three target v3_ Galaxy content tools", () => {
+      const toolNames = [
+        "v3_ansible_content_collections_index",
+        "v3_ansible_content_collections_index_versions_get_distro_base_pa",
+        "v3_execution_environments_repositories_get_repositories",
+      ];
+
+      for (const name of toolNames) {
+        const mockTool = createMockTool({ name });
+        const result = reformatGalaxyTool(mockTool);
+        expect(result).toBeTruthy();
       }
     });
   });
@@ -312,6 +345,53 @@ describe("OpenAPI Loader", () => {
     });
   });
 
+  describe("reformatLightspeedTool", () => {
+    it("should prepend /api/lightspeed/v1 to path template and rename mapped tools", () => {
+      const mockTool = createMockTool({
+        name: "ai_chat_create",
+        pathTemplate: "/ai/chat/",
+      });
+
+      const result = reformatLightspeedTool(mockTool);
+
+      expect(result).toBeTruthy();
+      if (result) {
+        expect(result.pathTemplate).toBe("/api/lightspeed/v1/ai/chat/");
+        expect(result.name).toBe("aap_rag_search");
+      }
+    });
+
+    it("should filter out the streaming endpoint", () => {
+      const mockTool = createMockTool({
+        name: "ai_streaming_chat_create",
+        pathTemplate: "/ai/streaming_chat/",
+      });
+
+      const result = reformatLightspeedTool(mockTool);
+
+      expect(result).toBe(false);
+      expect(mockTool.logs).toContainEqual({
+        severity: "INFO",
+        msg: "tool ignored, streaming endpoint not supported",
+      });
+    });
+
+    it("should pass through non-streaming tools unchanged", () => {
+      const mockTool = createMockTool({
+        name: "ai_completions_create",
+        pathTemplate: "/ai/completions/",
+      });
+
+      const result = reformatLightspeedTool(mockTool);
+
+      expect(result).toBeTruthy();
+      if (result) {
+        expect(result.name).toBe("ai_completions_create");
+        expect(result.pathTemplate).toBe("/api/lightspeed/v1/ai/completions/");
+      }
+    });
+  });
+
   describe("getReformatFunctions", () => {
     it("should return all reformat functions", () => {
       const functions = getReformatFunctions();
@@ -320,10 +400,12 @@ describe("OpenAPI Loader", () => {
       expect(functions).toHaveProperty("gateway");
       expect(functions).toHaveProperty("galaxy");
       expect(functions).toHaveProperty("controller");
+      expect(functions).toHaveProperty("lightspeed");
       expect(typeof functions.eda).toBe("function");
       expect(typeof functions.gateway).toBe("function");
       expect(typeof functions.galaxy).toBe("function");
       expect(typeof functions.controller).toBe("function");
+      expect(typeof functions.lightspeed).toBe("function");
     });
   });
 
