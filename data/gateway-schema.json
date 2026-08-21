@@ -640,6 +640,14 @@
                     },
                     {
                         "in": "query",
+                        "name": "pkce_required",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by pkce_required (exact match)"
+                    },
+                    {
+                        "in": "query",
                         "name": "post_logout_redirect_uris",
                         "schema": {
                             "type": "string"
@@ -5538,7 +5546,7 @@
                         "description": ""
                     }
                 },
-                "x-ai-description": "Retrieve single feature flag"
+                "x-ai-description": "Returns the current state of all feature flags on the Gateway platform."
             },
             "patch": {
                 "operationId": "feature_flags_partial_update",
@@ -7025,6 +7033,14 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "reject_failed_basic_auth",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by reject_failed_basic_auth (exact match)"
                     },
                     {
                         "in": "query",
@@ -10485,7 +10501,7 @@
         "/api/gateway/v1/role_team_assignments/": {
             "get": {
                 "operationId": "role_team_assignments_list",
-                "description": "Use this endpoint to give a team permission to a resource or an organization.\nThe needed data is the team, the role definition, and the object id.\nThe object must be of the type specified in the role definition.\nThe type given in the role definition and the provided object_id are used\nto look up the resource.\n\nAfter creation, the assignment cannot be edited, but can be deleted to\nremove those permissions.",
+                "description": "Bypasses BaseAssignmentViewSet's visible_items filter for callers who\ncan view all users (superusers and org admins when\nORG_ADMINS_CAN_SEE_ALL_USERS is enabled).\n\nThe gateway does not enforce remote object permissions\n(ANSIBLE_BASE_ENFORCE_REMOTE_OBJECT_PERMISSIONS=False), so the\nRoleEvaluation cache that visible_items relies on is incomplete for\nremote objects (e.g. AWX job templates).  That causes visible_items\nto hide assignments the privileged user should see.\n\nDRF filter backends still apply query-param filtering (object_id,\ncontent_type, etc.).",
                 "parameters": [
                     {
                         "in": "query",
@@ -10577,7 +10593,7 @@
             },
             "post": {
                 "operationId": "role_team_assignments_create",
-                "description": "Use this endpoint to give a team permission to a resource or an organization.\nThe needed data is the team, the role definition, and the object id.\nThe object must be of the type specified in the role definition.\nThe type given in the role definition and the provided object_id are used\nto look up the resource.\n\nAfter creation, the assignment cannot be edited, but can be deleted to\nremove those permissions.",
+                "description": "Bypasses BaseAssignmentViewSet's visible_items filter for callers who\ncan view all users (superusers and org admins when\nORG_ADMINS_CAN_SEE_ALL_USERS is enabled).\n\nThe gateway does not enforce remote object permissions\n(ANSIBLE_BASE_ENFORCE_REMOTE_OBJECT_PERMISSIONS=False), so the\nRoleEvaluation cache that visible_items relies on is incomplete for\nremote objects (e.g. AWX job templates).  That causes visible_items\nto hide assignments the privileged user should see.\n\nDRF filter backends still apply query-param filtering (object_id,\ncontent_type, etc.).",
                 "tags": [
                     "role_team_assignments"
                 ],
@@ -10630,7 +10646,7 @@
         "/api/gateway/v1/role_team_assignments/{id}/": {
             "get": {
                 "operationId": "role_team_assignments_retrieve",
-                "description": "Use this endpoint to give a team permission to a resource or an organization.\nThe needed data is the team, the role definition, and the object id.\nThe object must be of the type specified in the role definition.\nThe type given in the role definition and the provided object_id are used\nto look up the resource.\n\nAfter creation, the assignment cannot be edited, but can be deleted to\nremove those permissions.",
+                "description": "Bypasses BaseAssignmentViewSet's visible_items filter for callers who\ncan view all users (superusers and org admins when\nORG_ADMINS_CAN_SEE_ALL_USERS is enabled).\n\nThe gateway does not enforce remote object permissions\n(ANSIBLE_BASE_ENFORCE_REMOTE_OBJECT_PERMISSIONS=False), so the\nRoleEvaluation cache that visible_items relies on is incomplete for\nremote objects (e.g. AWX job templates).  That causes visible_items\nto hide assignments the privileged user should see.\n\nDRF filter backends still apply query-param filtering (object_id,\ncontent_type, etc.).",
                 "parameters": [
                     {
                         "in": "path",
@@ -10672,7 +10688,7 @@
             },
             "delete": {
                 "operationId": "role_team_assignments_destroy",
-                "description": "Use this endpoint to give a team permission to a resource or an organization.\nThe needed data is the team, the role definition, and the object id.\nThe object must be of the type specified in the role definition.\nThe type given in the role definition and the provided object_id are used\nto look up the resource.\n\nAfter creation, the assignment cannot be edited, but can be deleted to\nremove those permissions.",
+                "description": "Bypasses BaseAssignmentViewSet's visible_items filter for callers who\ncan view all users (superusers and org admins when\nORG_ADMINS_CAN_SEE_ALL_USERS is enabled).\n\nThe gateway does not enforce remote object permissions\n(ANSIBLE_BASE_ENFORCE_REMOTE_OBJECT_PERMISSIONS=False), so the\nRoleEvaluation cache that visible_items relies on is incomplete for\nremote objects (e.g. AWX job templates).  That causes visible_items\nto hide assignments the privileged user should see.\n\nDRF filter backends still apply query-param filtering (object_id,\ncontent_type, etc.).",
                 "parameters": [
                     {
                         "in": "path",
@@ -10939,6 +10955,7 @@
         "/api/gateway/v1/role_user_assignments/": {
             "get": {
                 "operationId": "role_user_assignments_list",
+                "description": "ViewSet for managing user role assignments with upstream service synchronization.",
                 "parameters": [
                     {
                         "in": "query",
@@ -11116,6 +11133,7 @@
         "/api/gateway/v1/role_user_assignments/{id}/": {
             "get": {
                 "operationId": "role_user_assignments_retrieve",
+                "description": "ViewSet for managing user role assignments with upstream service synchronization.",
                 "parameters": [
                     {
                         "in": "path",
@@ -11157,6 +11175,7 @@
             },
             "delete": {
                 "operationId": "role_user_assignments_destroy",
+                "description": "ViewSet for managing user role assignments with upstream service synchronization.",
                 "parameters": [
                     {
                         "in": "path",
@@ -11556,6 +11575,14 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "reject_failed_basic_auth",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by reject_failed_basic_auth (exact match)"
                     },
                     {
                         "in": "query",
@@ -12157,6 +12184,15 @@
                         }
                     },
                     {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "in": "query",
                         "name": "role_level",
                         "schema": {
@@ -12293,7 +12329,7 @@
         "/api/gateway/v1/service-index/resources/": {
             "get": {
                 "operationId": "service_index_resources_list",
-                "description": "Index of all the resources in the system.",
+                "description": "List all resources. Accepts an optional 'extra_fields' query parameter (comma-separated) to include additional fields in the response. Supported values: resource_data.",
                 "parameters": [
                     {
                         "in": "query",
@@ -12420,6 +12456,15 @@
                         "required": false,
                         "in": "query",
                         "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
                         "schema": {
                             "type": "integer"
                         }
@@ -12735,6 +12780,59 @@
                 "x-ai-description": "Delete existing service index resource"
             }
         },
+        "/api/gateway/v1/service-index/resources/bulk-update/": {
+            "post": {
+                "operationId": "service_index_resources_bulk_update_create",
+                "description": "Bulk-update resource metadata (new_service_id, new_ansible_id, is_partially_migrated, resource_data).\n\nAccepts a JSON object with an ``items`` key containing a list of update objects.\nEach object must contain at minimum an ``ansible_id`` identifying the resource\nto update plus one or more fields to change.\nEach item is applied in its own savepoint so that a failure in one item\ndoes not roll back others.\n\nReturns a summary with the count of updated resources and any per-item errors.\n\nPerformance note:\n    This endpoint uses a loop-of-singles pattern (one savepoint + update_resource()\n    per item) rather than Django's QuerySet.bulk_update(). This is an intentional\n    trade-off: ResourceTypeProcessor.save() is a per-service plugin point with\n    custom logic (e.g. M2M permission handling in RoleDefinitionProcessor) that\n    cannot be expressed as a single bulk SQL statement. The primary performance\n    gain of this endpoint comes from eliminating N HTTP round-trips — the DB query\n    overhead of per-item saves is negligible on a local connection for typical\n    batch sizes (100-1000 items). True DB-level batching can be explored as a\n    future optimization for metadata-only fields.",
+                "tags": [
+                    "service-index"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "OAuth2_Authentication": []
+                    },
+                    {
+                        "SessionAuthentication": []
+                    },
+                    {
+                        "Basic_Authentication": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Resource"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "x-ai-description": "Create new service index resources bulk update"
+            }
+        },
         "/api/gateway/v1/service-index/role-permissions/": {
             "get": {
                 "operationId": "service_index_role_permissions_list",
@@ -12932,134 +13030,6 @@
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "content_object",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by content_object (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "content_type",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by content_type (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__gt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (gt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__gte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (gte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__lt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (lt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__lte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (lte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created_by",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created_by (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__gt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (gt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__gte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (gte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__lt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (lt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__lte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (lte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_id (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_id__icontains",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_id (case-insensitive partial match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_role",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_role (exact match)"
-                    },
-                    {
-                        "in": "query",
                         "name": "order",
                         "schema": {
                             "type": "string"
@@ -13094,14 +13064,6 @@
                     },
                     {
                         "in": "query",
-                        "name": "role_definition",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by role_definition (exact match)"
-                    },
-                    {
-                        "in": "query",
                         "name": "role_level",
                         "schema": {
                             "type": "string"
@@ -13116,14 +13078,6 @@
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    {
-                        "in": "query",
-                        "name": "team",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by team (exact match)"
                     },
                     {
                         "in": "query",
@@ -13498,134 +13452,6 @@
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "content_object",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by content_object (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "content_type",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by content_type (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__gt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (gt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__gte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (gte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__lt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (lt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created__lte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created (lte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "created_by",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by created_by (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__gt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (gt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__gte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (gte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__lt",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (lt)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "id__lte",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by id (lte)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_id (exact match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_id__icontains",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_id (case-insensitive partial match)"
-                    },
-                    {
-                        "in": "query",
-                        "name": "object_role",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by object_role (exact match)"
-                    },
-                    {
-                        "in": "query",
                         "name": "order",
                         "schema": {
                             "type": "string"
@@ -13660,14 +13486,6 @@
                     },
                     {
                         "in": "query",
-                        "name": "role_definition",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by role_definition (exact match)"
-                    },
-                    {
-                        "in": "query",
                         "name": "role_level",
                         "schema": {
                             "type": "string"
@@ -13690,14 +13508,6 @@
                             "type": "string"
                         },
                         "description": "Filter by object type. Supports comma-separated values for multiple types."
-                    },
-                    {
-                        "in": "query",
-                        "name": "user",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by user (exact match)"
                     }
                 ],
                 "tags": [
@@ -15460,6 +15270,14 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "reject_failed_basic_auth",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by reject_failed_basic_auth (exact match)"
                     },
                     {
                         "in": "query",
@@ -19251,6 +19069,14 @@
                     },
                     {
                         "in": "query",
+                        "name": "reject_failed_basic_auth",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by reject_failed_basic_auth (exact match)"
+                    },
+                    {
+                        "in": "query",
                         "name": "request_timeout_seconds",
                         "schema": {
                             "type": "string"
@@ -20071,7 +19897,7 @@
                         "description": ""
                     }
                 },
-                "x-ai-description": "Retrieve single status"
+                "x-ai-description": "Returns the current Gateway platform status, including service health and version."
             }
         },
         "/api/gateway/v1/teams/": {
@@ -22820,6 +22646,14 @@
                     },
                     {
                         "in": "query",
+                        "name": "reject_failed_basic_auth",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Filter by reject_failed_basic_auth (exact match)"
+                    },
+                    {
+                        "in": "query",
                         "name": "request_timeout_seconds",
                         "schema": {
                             "type": "string"
@@ -24467,6 +24301,10 @@
                         "type": "boolean",
                         "description": "If true, the AAP gateway will only allow other AAP services to access this route. Requires gateway auth to be enabled."
                     },
+                    "reject_failed_basic_auth": {
+                        "type": "boolean",
+                        "description": "If true, requests with invalid Basic credentials will receive a 401 instead of being passed to the back end. Requests without credentials continue to be passed through anonymously."
+                    },
                     "service_path": {
                         "type": "string",
                         "description": "The URL path on the AAP Service cluster to route traffic to.",
@@ -24678,24 +24516,24 @@
                     },
                     "type": {
                         "enum": [
-                            "ansible_base.authentication.authenticator_plugins.ldap",
-                            "ansible_base.authentication.authenticator_plugins.keycloak",
-                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
-                            "ansible_base.authentication.authenticator_plugins.radius",
-                            "ansible_base.authentication.authenticator_plugins.local",
-                            "ansible_base.authentication.authenticator_plugins.github",
                             "ansible_base.authentication.authenticator_plugins.github_team",
-                            "ansible_base.authentication.authenticator_plugins.azuread",
-                            "ansible_base.authentication.authenticator_plugins.oidc",
-                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team",
                             "ansible_base.authentication.authenticator_plugins.github_enterprise_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
                             "ansible_base.authentication.authenticator_plugins.saml",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
+                            "ansible_base.authentication.authenticator_plugins.oidc",
                             "ansible_base.authentication.authenticator_plugins.github_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team"
+                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
+                            "ansible_base.authentication.authenticator_plugins.local",
+                            "ansible_base.authentication.authenticator_plugins.azuread",
+                            "ansible_base.authentication.authenticator_plugins.keycloak",
+                            "ansible_base.authentication.authenticator_plugins.radius",
+                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github",
+                            "ansible_base.authentication.authenticator_plugins.ldap"
                         ],
                         "type": "string",
-                        "description": "* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team",
+                        "description": "* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap",
                         "x-spec-enum-id": "ac765e9996806d56"
                     },
                     "order": {
@@ -24935,26 +24773,26 @@
                     },
                     "type": {
                         "enum": [
-                            "ansible_base.authentication.authenticator_plugins.ldap",
-                            "ansible_base.authentication.authenticator_plugins.keycloak",
-                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
-                            "ansible_base.authentication.authenticator_plugins.radius",
-                            "ansible_base.authentication.authenticator_plugins.local",
-                            "ansible_base.authentication.authenticator_plugins.github",
                             "ansible_base.authentication.authenticator_plugins.github_team",
-                            "ansible_base.authentication.authenticator_plugins.azuread",
-                            "ansible_base.authentication.authenticator_plugins.oidc",
-                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team",
                             "ansible_base.authentication.authenticator_plugins.github_enterprise_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
                             "ansible_base.authentication.authenticator_plugins.saml",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
+                            "ansible_base.authentication.authenticator_plugins.oidc",
                             "ansible_base.authentication.authenticator_plugins.github_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team"
+                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
+                            "ansible_base.authentication.authenticator_plugins.local",
+                            "ansible_base.authentication.authenticator_plugins.azuread",
+                            "ansible_base.authentication.authenticator_plugins.keycloak",
+                            "ansible_base.authentication.authenticator_plugins.radius",
+                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github",
+                            "ansible_base.authentication.authenticator_plugins.ldap"
                         ],
                         "type": "string",
                         "x-spec-enum-id": "ac765e9996806d56",
                         "readOnly": true,
-                        "description": "The type of authentication service this is.\n\n* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team"
+                        "description": "The type of authentication service this is.\n\n* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap"
                     },
                     "order": {
                         "type": "integer",
@@ -25859,6 +25697,10 @@
                     "skip_authorization": {
                         "type": "boolean",
                         "description": "Set True to skip authorization step for completely trusted applications."
+                    },
+                    "pkce_required": {
+                        "type": "boolean",
+                        "description": "When True, clients must use PKCE (send code_challenge) when requesting authorization codes for this application."
                     },
                     "authorization_grant_type": {
                         "enum": [
@@ -27236,6 +27078,10 @@
                         "type": "boolean",
                         "description": "If true, the AAP gateway will only allow other AAP services to access this route. Requires gateway auth to be enabled."
                     },
+                    "reject_failed_basic_auth": {
+                        "type": "boolean",
+                        "description": "If true, requests with invalid Basic credentials will receive a 401 instead of being passed to the back end. Requests without credentials continue to be passed through anonymously."
+                    },
                     "service_path": {
                         "type": "string",
                         "description": "The URL path on the AAP Service cluster to route traffic to.",
@@ -27444,26 +27290,26 @@
                     },
                     "type": {
                         "enum": [
-                            "ansible_base.authentication.authenticator_plugins.ldap",
-                            "ansible_base.authentication.authenticator_plugins.keycloak",
-                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
-                            "ansible_base.authentication.authenticator_plugins.radius",
-                            "ansible_base.authentication.authenticator_plugins.local",
-                            "ansible_base.authentication.authenticator_plugins.github",
                             "ansible_base.authentication.authenticator_plugins.github_team",
-                            "ansible_base.authentication.authenticator_plugins.azuread",
-                            "ansible_base.authentication.authenticator_plugins.oidc",
-                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team",
                             "ansible_base.authentication.authenticator_plugins.github_enterprise_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
                             "ansible_base.authentication.authenticator_plugins.saml",
+                            "ansible_base.authentication.authenticator_plugins.github_enterprise",
+                            "ansible_base.authentication.authenticator_plugins.oidc",
                             "ansible_base.authentication.authenticator_plugins.github_org",
-                            "ansible_base.authentication.authenticator_plugins.github_enterprise_team"
+                            "ansible_base.authentication.authenticator_plugins.google_oauth2",
+                            "ansible_base.authentication.authenticator_plugins.local",
+                            "ansible_base.authentication.authenticator_plugins.azuread",
+                            "ansible_base.authentication.authenticator_plugins.keycloak",
+                            "ansible_base.authentication.authenticator_plugins.radius",
+                            "ansible_base.authentication.authenticator_plugins.tacacs",
+                            "ansible_base.authentication.authenticator_plugins.github",
+                            "ansible_base.authentication.authenticator_plugins.ldap"
                         ],
                         "type": "string",
                         "x-spec-enum-id": "ac765e9996806d56",
                         "readOnly": true,
-                        "description": "The type of authentication service this is.\n\n* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team"
+                        "description": "The type of authentication service this is.\n\n* `ansible_base.authentication.authenticator_plugins.github_team` - ansible_base.authentication.authenticator_plugins.github_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_team` - ansible_base.authentication.authenticator_plugins.github_enterprise_team\n* `ansible_base.authentication.authenticator_plugins.github_enterprise_org` - ansible_base.authentication.authenticator_plugins.github_enterprise_org\n* `ansible_base.authentication.authenticator_plugins.saml` - ansible_base.authentication.authenticator_plugins.saml\n* `ansible_base.authentication.authenticator_plugins.github_enterprise` - ansible_base.authentication.authenticator_plugins.github_enterprise\n* `ansible_base.authentication.authenticator_plugins.oidc` - ansible_base.authentication.authenticator_plugins.oidc\n* `ansible_base.authentication.authenticator_plugins.github_org` - ansible_base.authentication.authenticator_plugins.github_org\n* `ansible_base.authentication.authenticator_plugins.google_oauth2` - ansible_base.authentication.authenticator_plugins.google_oauth2\n* `ansible_base.authentication.authenticator_plugins.local` - ansible_base.authentication.authenticator_plugins.local\n* `ansible_base.authentication.authenticator_plugins.azuread` - ansible_base.authentication.authenticator_plugins.azuread\n* `ansible_base.authentication.authenticator_plugins.keycloak` - ansible_base.authentication.authenticator_plugins.keycloak\n* `ansible_base.authentication.authenticator_plugins.radius` - ansible_base.authentication.authenticator_plugins.radius\n* `ansible_base.authentication.authenticator_plugins.tacacs` - ansible_base.authentication.authenticator_plugins.tacacs\n* `ansible_base.authentication.authenticator_plugins.github` - ansible_base.authentication.authenticator_plugins.github\n* `ansible_base.authentication.authenticator_plugins.ldap` - ansible_base.authentication.authenticator_plugins.ldap"
                     },
                     "order": {
                         "type": "integer",
@@ -27826,6 +27672,10 @@
                         "type": "boolean",
                         "description": "Set True to skip authorization step for completely trusted applications."
                     },
+                    "pkce_required": {
+                        "type": "boolean",
+                        "description": "When True, clients must use PKCE (send code_challenge) when requesting authorization codes for this application."
+                    },
                     "authorization_grant_type": {
                         "enum": [
                             "authorization-code",
@@ -28144,6 +27994,10 @@
                         "type": "boolean",
                         "description": "If true, the AAP gateway will only allow other AAP services to access this route. Requires gateway auth to be enabled."
                     },
+                    "reject_failed_basic_auth": {
+                        "type": "boolean",
+                        "description": "If true, requests with invalid Basic credentials will receive a 401 instead of being passed to the back end. Requests without credentials continue to be passed through anonymously."
+                    },
                     "service_path": {
                         "type": "string",
                         "description": "The URL path on the AAP Service cluster to route traffic to.",
@@ -28355,6 +28209,11 @@
                         "type": "string",
                         "readOnly": true,
                         "description": "The effective health check timeout Envoy will use, computed as the maximum of the cluster's health_check_timeout_seconds, the highest route request_timeout_seconds, and the global request_timeout preference."
+                    },
+                    "effective_health_check_interval_seconds": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "The effective health check interval Envoy will use, computed as the maximum of the cluster's health_check_interval_seconds and the effective health check timeout."
                     }
                 }
             },
@@ -28798,7 +28657,7 @@
             },
             "PatchedUser": {
                 "type": "object",
-                "description": "Disallows editing of system user and enforces superuser requirement.",
+                "description": "Disallows editing of system user and enforces superuser requirement.\nRestricts email changes to admins via EmailAdminOnlyMixin.",
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -29411,6 +29270,10 @@
                         "type": "boolean",
                         "description": "If true, the AAP gateway will only allow other AAP services to access this route. Requires gateway auth to be enabled."
                     },
+                    "reject_failed_basic_auth": {
+                        "type": "boolean",
+                        "description": "If true, requests with invalid Basic credentials will receive a 401 instead of being passed to the back end. Requests without credentials continue to be passed through anonymously."
+                    },
                     "service_path": {
                         "type": "string",
                         "description": "The URL path on the AAP Service cluster to route traffic to.",
@@ -29631,6 +29494,11 @@
                         "type": "string",
                         "readOnly": true,
                         "description": "The effective health check timeout Envoy will use, computed as the maximum of the cluster's health_check_timeout_seconds, the highest route request_timeout_seconds, and the global request_timeout preference."
+                    },
+                    "effective_health_check_interval_seconds": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "The effective health check interval Envoy will use, computed as the maximum of the cluster's health_check_interval_seconds and the effective health check timeout."
                     }
                 },
                 "required": [
@@ -29843,6 +29711,10 @@
             "ServiceRoleTeamAssignment": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
                     "created": {
                         "type": "string",
                         "format": "date-time",
@@ -29884,6 +29756,10 @@
             "ServiceRoleUserAssignment": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
                     "created": {
                         "type": "string",
                         "format": "date-time",
@@ -30211,6 +30087,14 @@
                         "default": 900,
                         "description": "The time in seconds before a session expires."
                     },
+                    "MAX_EXTRA_SESSIONS_PER_USER": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": -1,
+                        "default": -1,
+                        "title": "Maximum Number of Simultaneous Logged In Sessions",
+                        "description": "Maximum number of simultaneous logged-in sessions allowed per user. -1 means unlimited (no enforcement). 0 means only one session is allowed (any other session is terminated on login). A positive number N allows N additional concurrent sessions beyond the first."
+                    },
                     "DEFAULT_PAGE_SIZE": {
                         "type": "integer",
                         "default": 50,
@@ -30261,13 +30145,6 @@
                         "title": "Gather Insights data for Automation Analytics",
                         "description": "Enables the service to gather data on automation and send it to Automation Analytics."
                     },
-                    "RED_HAT_CONSOLE_URL": {
-                        "type": "string",
-                        "format": "uri",
-                        "default": "https://console.redhat.com",
-                        "title": "Automation Analytics upload URL",
-                        "description": "This setting is used to to configure the upload URL for data collection for Automation Analytics."
-                    },
                     "REDHAT_USERNAME": {
                         "type": "string",
                         "default": "",
@@ -30312,16 +30189,9 @@
                     "RUNTIME_FEATURE_FLAGS": {
                         "type": "boolean",
                         "readOnly": true,
-                        "default": false,
+                        "default": true,
                         "title": "Runtime Feature Flag Toggling",
                         "description": "Controls whether toggling of runtime flags is allowed. This is currently set through settings. If you'd like to change this please update the RUNTIME_FEATURE_FLAGS setting in your configuration."
-                    },
-                    "RUNTIME_FEATURE_FLAGS_UI": {
-                        "type": "boolean",
-                        "readOnly": true,
-                        "default": false,
-                        "title": "Feature Flags UI Page",
-                        "description": "Controls whether the feature flags UI page is displayed. This is currently set through settings. If you'd like to change this please update the RUNTIME_FEATURE_FLAGS_UI setting in your configuration."
                     }
                 }
             },
@@ -30833,7 +30703,7 @@
             },
             "User": {
                 "type": "object",
-                "description": "Disallows editing of system user and enforces superuser requirement.",
+                "description": "Disallows editing of system user and enforces superuser requirement.\nRestricts email changes to admins via EmailAdminOnlyMixin.",
                 "properties": {
                     "id": {
                         "type": "integer",

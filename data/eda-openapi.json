@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Event Driven Ansible API",
-        "version": "1.3.0"
+        "version": "1.3.8"
     },
     "paths": {
         "/activation-instances/": {
@@ -4752,6 +4752,15 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "tags": [
@@ -4853,13 +4862,22 @@
         "/service-index/resources/": {
             "get": {
                 "operationId": "service_index_resources_list",
-                "description": "Index of all the resources in the system.",
+                "description": "List all resources. Accepts an optional 'extra_fields' query parameter (comma-separated) to include additional fields in the response. Supported values: resource_data.",
                 "parameters": [
                     {
                         "name": "page",
                         "required": false,
                         "in": "query",
                         "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
                         "schema": {
                             "type": "integer"
                         }
@@ -5105,6 +5123,52 @@
                 "responses": {
                     "204": {
                         "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/service-index/resources/bulk-update/": {
+            "post": {
+                "operationId": "service_index_resources_bulk_update_create",
+                "description": "Bulk-update resource metadata (new_service_id, new_ansible_id, is_partially_migrated, resource_data).\n\nAccepts a JSON object with an ``items`` key containing a list of update objects.\nEach object must contain at minimum an ``ansible_id`` identifying the resource\nto update plus one or more fields to change.\nEach item is applied in its own savepoint so that a failure in one item\ndoes not roll back others.\n\nReturns a summary with the count of updated resources and any per-item errors.\n\nPerformance note:\n    This endpoint uses a loop-of-singles pattern (one savepoint + update_resource()\n    per item) rather than Django's QuerySet.bulk_update(). This is an intentional\n    trade-off: ResourceTypeProcessor.save() is a per-service plugin point with\n    custom logic (e.g. M2M permission handling in RoleDefinitionProcessor) that\n    cannot be expressed as a single bulk SQL statement. The primary performance\n    gain of this endpoint comes from eliminating N HTTP round-trips — the DB query\n    overhead of per-item saves is negligible on a local connection for typical\n    batch sizes (100-1000 items). True DB-level batching can be explored as a\n    future optimization for metadata-only fields.",
+                "tags": [
+                    "service-index"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "EDAJWTAuthentication": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Resource"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
             }
@@ -5535,7 +5599,7 @@
                                 }
                             }
                         },
-                        "description": ""
+                        "description": "EDA is healthy or degraded (workers down but database is available)."
                     },
                     "500": {
                         "content": {
@@ -5545,7 +5609,7 @@
                                 }
                             }
                         },
-                        "description": ""
+                        "description": "EDA is unavailable (database failure)."
                     }
                 }
             }
@@ -10731,6 +10795,10 @@
             "ServiceRoleTeamAssignment": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
                     "created": {
                         "type": "string",
                         "format": "date-time",
@@ -10767,6 +10835,7 @@
                 "required": [
                     "content_type",
                     "created",
+                    "id",
                     "role_definition",
                     "team_ansible_id"
                 ]
@@ -10774,6 +10843,10 @@
             "ServiceRoleUserAssignment": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
                     "created": {
                         "type": "string",
                         "format": "date-time",
@@ -10810,6 +10883,7 @@
                 "required": [
                     "content_type",
                     "created",
+                    "id",
                     "role_definition",
                     "user_ansible_id"
                 ]
