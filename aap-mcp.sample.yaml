@@ -211,9 +211,6 @@ toolsets:
     - controller.organizations_instance_groups_create
     - controller.organizations_galaxy_credentials_create
 
-  ai_assistant:
-    - lightspeed.ai_chat_create
-
   content_discovery:
     - galaxy.ansible_content_collections_index
     - galaxy.ansible_content_collections_index_versions_get_distro_base_pa
