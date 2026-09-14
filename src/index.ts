@@ -22,6 +22,7 @@ import { AnalyticsService } from "./analytics.js";
 import { PseudoIdentityService, type UserInfo } from "./pseudo-identity.js";
 import { AapMcpConfig, loadToolsetsFromCfg } from "./config-utils.js";
 import { DISCOVER_TOOLS, handleDiscoverTool } from "./discover.js";
+import { JsonRpcErrorCode } from "./error-codes.js";
 import { resolveMcpPort } from "./port.js";
 import {
   buildConfig,
@@ -511,7 +512,7 @@ app.use((req, res, next) => {
       res.status(401).json({
         jsonrpc: "2.0",
         error: {
-          code: -32000,
+          code: JsonRpcErrorCode.INVALID_REQUEST,
           message: "Unauthorized: Bearer token required",
         },
         id: null,
@@ -608,7 +609,7 @@ const mcpPostHandler = async (
       res.status(401).json({
         jsonrpc: "2.0",
         error: {
-          code: -32000,
+          code: JsonRpcErrorCode.INVALID_REQUEST,
           message: isInvalidToken
             ? "Unauthorized: Invalid or expired token"
             : "Unauthorized: Bearer token required",
@@ -647,7 +648,7 @@ const mcpPostHandler = async (
       res.status(500).json({
         jsonrpc: "2.0",
         error: {
-          code: -32603,
+          code: JsonRpcErrorCode.INTERNAL_ERROR,
           message: "Internal server error",
           data: error instanceof Error ? error.message : String(error),
         },
