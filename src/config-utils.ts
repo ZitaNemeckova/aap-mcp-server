@@ -10,6 +10,7 @@ export interface AapMcpConfig {
   services?: ServiceConfig[];
   toolsets: Record<string, string[]>;
   analytics_key?: string;
+  allowed_origins?: string[];
 }
 
 /**

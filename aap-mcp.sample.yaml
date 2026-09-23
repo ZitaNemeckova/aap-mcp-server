@@ -23,6 +23,12 @@
 # Allow write operation (POST, DELETE and PATCH)
 # allow_write_operations: false
 
+# Extra browser origins for DNS-rebinding protection (Origin validation). The
+# gateway (base_url) and localhost are always allowed; list only additional
+# origins here. Lower priority than the ALLOWED_ORIGINS env var (comma-separated).
+# allowed_origins:
+#   - "https://chatbot.example.com"
+
 services:
   - name: controller
     # url: "https://custom-controller.example.com/api/v2/schema/"
