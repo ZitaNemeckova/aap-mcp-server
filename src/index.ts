@@ -11,10 +11,7 @@ import {
   McpServer,
   type McpRequestContext,
 } from "@modelcontextprotocol/server";
-import {
-  extractToolsFromApi,
-  SCHEMA_OVERRIDES,
-} from "./extract-tools.js";
+import { extractToolsFromApi, SCHEMA_OVERRIDES } from "./extract-tools.js";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import * as yaml from "js-yaml";
@@ -641,8 +638,7 @@ const applyWwwAuthenticate = (
 const mcpHandler = createMcpHandler(
   (ctx: McpRequestContext) => {
     const requestCtx = ctx.authInfo?.extra as unknown as
-      | RequestContext
-      | undefined;
+      RequestContext | undefined;
     if (!requestCtx) {
       throw new Error("Missing request context");
     }
